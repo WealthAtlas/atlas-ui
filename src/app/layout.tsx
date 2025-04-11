@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ApolloProvider } from '@apollo/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { apolloClient } from '@/lib/apollo-client';
+import Navigation from '@/components/layout/Navigation';
+import { AuthProvider } from '@/lib/auth';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +17,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const queryClient = new QueryClient();
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,7 +35,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ApolloProvider client={apolloClient}>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <Navigation />
+              {children}
+              <ReactQueryDevtools initialIsOpen={false} />
+            </AuthProvider>
+          </QueryClientProvider>
+        </ApolloProvider>
       </body>
     </html>
   );
